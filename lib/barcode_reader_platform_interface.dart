@@ -23,7 +23,5 @@ abstract class BarcodeReaderPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
-  }
+  void initBarcodeCallback({required Null Function(String) onScannedBarcode});
 }

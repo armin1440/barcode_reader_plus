@@ -2,7 +2,7 @@
 import 'barcode_reader_platform_interface.dart';
 
 class BarcodeReader {
-  Future<String?> getPlatformVersion() {
-    return BarcodeReaderPlatform.instance.getPlatformVersion();
+  void initBarcodeCallback({required Null Function(String) onScannedBarcode}){
+    return BarcodeReaderPlatform.instance.initBarcodeCallback(onScannedBarcode: onScannedBarcode);
   }
 }

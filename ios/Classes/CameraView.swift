@@ -2,14 +2,17 @@ import UIKit
 import AVFoundation
 import MLKitVision
 import MLKitBarcodeScanning
-
+import Flutter
 
 class CameraView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
     private let captureSession = AVCaptureSession()
     private var previewLayer: AVCaptureVideoPreviewLayer?
     private let barcodeScanner = BarcodeScanner.barcodeScanner()
+    private var isProcessing = false
+    private var methodChannel: FlutterMethodChannel?
 
-    override init(frame: CGRect) {
+    init(frame: CGRect, methodChannel: FlutterMethodChannel) {
+        self.methodChannel = methodChannel
         super.init(frame: frame)
         initializeCamera()
     }
@@ -20,29 +23,39 @@ class CameraView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
     }
 
     private func initializeCamera() {
+        // Configure camera device
         guard let device = AVCaptureDevice.default(for: .video),
-              let input = try? AVCaptureDeviceInput(device: device) else {
+              let input = try? AVCaptureDeviceInput(device: device),
+              captureSession.canAddInput(input) else {
+            print("Failed to initialize camera input")
             return
         }
 
         captureSession.beginConfiguration()
-        if captureSession.canAddInput(input) {
-            captureSession.addInput(input)
+        captureSession.sessionPreset = .high
+        captureSession.addInput(input)
+
+        // Configure video output
+        let videoOutput = AVCaptureVideoDataOutput()
+        videoOutput.videoSettings = [
+            (kCVPixelBufferPixelFormatTypeKey as String): Int(kCVPixelFormatType_32BGRA)
+        ]
+        videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "camera.frame.processing"))
+
+        guard captureSession.canAddOutput(videoOutput) else {
+            print("Cannot add video output")
+            captureSession.commitConfiguration()
+            return
         }
 
-        // Set up preview layer
+        captureSession.addOutput(videoOutput)
+
+        // Configure preview layer
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer?.videoGravity = .resizeAspectFill
         previewLayer?.frame = bounds
-        if let previewLayer = previewLayer {
-            layer.addSublayer(previewLayer)
-        }
-
-        // Setup output
-        let output = AVCaptureVideoDataOutput()
-        output.setSampleBufferDelegate(self, queue: DispatchQueue(label: "barcodeQueue"))
-        if captureSession.canAddOutput(output) {
-            captureSession.addOutput(output)
+        if let layer = previewLayer {
+            self.layer.addSublayer(layer)
         }
 
         captureSession.commitConfiguration()
@@ -54,23 +67,38 @@ class CameraView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
         previewLayer?.frame = bounds
     }
 
-    // MARK: Barcode Detection
+    // MARK: - Frame Processing
 
-    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+    func captureOutput(_ output: AVCaptureOutput,
+                       didOutput sampleBuffer: CMSampleBuffer,
+                       from connection: AVCaptureConnection) {
+
+        guard !isProcessing else { return }
+        isProcessing = true
 
         let visionImage = VisionImage(buffer: sampleBuffer)
         visionImage.orientation = .right
 
-        barcodeScanner.process(visionImage) { barcodes, error in
+        barcodeScanner.process(visionImage) { [weak self] barcodes, error in
+            defer { self?.isProcessing = false }
+
             guard error == nil, let barcodes = barcodes else { return }
+
             for barcode in barcodes {
-                if let rawValue = barcode.rawValue {
-                    print("Scanned barcode: \(rawValue)")
-                    // TODO: Notify Flutter here
+                if let value = barcode.rawValue {
+                    print("Detected barcode: \(value)")
+                    self?.sendBarcodeToFlutter(value)
+                    break // Only report first barcode
                 }
             }
         }
     }
-}
 
+    // MARK: - Flutter Communication
+
+    private func sendBarcodeToFlutter(_ barcode: String) {
+        DispatchQueue.main.async {
+            self.methodChannel?.invokeMethod("onBarcodeScanned", arguments: barcode)
+        }
+    }
+}

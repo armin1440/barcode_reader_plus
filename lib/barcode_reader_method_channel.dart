@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -10,8 +12,12 @@ class MethodChannelBarcodeReader extends BarcodeReaderPlatform {
   final methodChannel = const MethodChannel('barcode_reader');
 
   @override
-  Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
-    return version;
+  void initBarcodeCallback({required Null Function(String) onScannedBarcode}) {
+    methodChannel.setMethodCallHandler((call) async {
+      if (call.method == 'onBarcodeScanned') {
+        final String barcode = call.arguments;
+        onScannedBarcode(barcode);
+      }
+    });
   }
 }
