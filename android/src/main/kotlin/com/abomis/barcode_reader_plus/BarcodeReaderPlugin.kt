@@ -26,6 +26,7 @@ class BarcodeReaderPlugin : FlutterPlugin, MethodCallHandler {
         viewFactory?.toggleFlash(enabled)
         result.success(null)
       }
+
       "takePicture" -> {
         viewFactory?.takePicture { path ->
           if (path != null) {
@@ -34,6 +35,16 @@ class BarcodeReaderPlugin : FlutterPlugin, MethodCallHandler {
             result.error("capture_failed", "Photo capture failed", null)
           }
         }
+      }
+
+      "pauseCamera" -> {
+        viewFactory?.pauseCamera()
+        result.success(null)
+      }
+
+      "resumeCamera" -> {
+        viewFactory?.resumeCamera()
+        result.success(null)
       }
       else -> result.notImplemented()
     }

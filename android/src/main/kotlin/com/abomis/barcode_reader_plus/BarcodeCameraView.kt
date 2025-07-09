@@ -28,7 +28,7 @@ class BarcodeCameraView(
     private val previewView = PreviewView(context)
     private var cameraControl: CameraControl? = null
     private var imageCapture: ImageCapture? = null
-
+    private var cameraProvider: ProcessCameraProvider? = null
 
     init {
         addView(previewView)
@@ -39,8 +39,8 @@ class BarcodeCameraView(
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         cameraProviderFuture.addListener({
-            val provider = cameraProviderFuture.get()
-            bindCamera(provider)
+            cameraProvider = cameraProviderFuture.get()
+            bindCamera(cameraProvider!!)
         }, ContextCompat.getMainExecutor(context))
     }
 
@@ -124,5 +124,12 @@ class BarcodeCameraView(
         )
     }
 
+    fun pauseCamera() {
+        cameraProvider?.unbindAll()
+    }
 
+    fun resumeCamera() {
+        cameraProvider?.unbindAll()
+        bindCamera(cameraProvider!!)
+    }
 }

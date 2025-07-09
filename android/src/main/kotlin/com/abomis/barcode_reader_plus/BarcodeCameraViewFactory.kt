@@ -34,5 +34,12 @@ class BarcodeCameraViewFactory(
         cameraView?.takePicture(callback)
     }
 
+    fun pauseCamera() {
+        cameraView?.pauseCamera()
+    }
+
+    fun resumeCamera() {
+        cameraView?.resumeCamera()
+    }
 }
 
