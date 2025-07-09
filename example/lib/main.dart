@@ -17,6 +17,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final controller = BarcodeReaderController();
   bool flashState = false;
+  bool isPaused = false;
   String path = 'take pic';
 
   @override
@@ -36,6 +37,7 @@ class _MyAppState extends State<MyApp> {
             ),
             Row(
               children: [
+                Text('Flash'),
                 Switch(
                   onChanged: (newState) {
                     controller.toggleFlash(newState);
@@ -56,7 +58,18 @@ class _MyAppState extends State<MyApp> {
                       });
                     },
                   ),
-                )
+                ),
+                Switch(value: isPaused, onChanged: (newValue){
+                  if(isPaused) {
+                    controller.resumeCamera();
+                  }
+                  else{
+                    controller.pauseCamera();
+                  }
+                  setState(() {
+                    isPaused = newValue;
+                  });
+                })
               ],
             ),
           ],

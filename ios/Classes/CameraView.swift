@@ -187,4 +187,15 @@ extension CameraView: AVCapturePhotoCaptureDelegate {
             photoCaptureCompletion?(nil)
         }
     }
+
+    func pauseCamera() {
+        captureSession.stopRunning()
+    }
+
+    func resumeCamera() {
+        if !captureSession.isRunning {
+            captureSession.startRunning()
+        }
+    }
+
 }

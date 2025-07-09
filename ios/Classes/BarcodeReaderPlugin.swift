@@ -16,6 +16,7 @@ public class BarcodeReaderPlugin: NSObject, FlutterPlugin {
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
       switch call.method {
+
       case "toggleFlash":
           if let enabled = call.arguments as? Bool {
               if let cameraView = BarcodeReaderPlugin.cameraViewInstance {
@@ -31,6 +32,7 @@ public class BarcodeReaderPlugin: NSObject, FlutterPlugin {
                                   message: "Expected a boolean value for 'enabled'.",
                                   details: nil))
           }
+
       case "takePicture":
           if let view = BarcodeReaderPlugin.cameraViewInstance {
               view.takePicture { path in
@@ -43,6 +45,15 @@ public class BarcodeReaderPlugin: NSObject, FlutterPlugin {
           } else {
               result(FlutterError(code: "no_camera_view", message: "Camera view is not initialized", details: nil))
           }
+
+      case "pauseCamera":
+          BarcodeReaderPlugin.cameraViewInstance?.pauseCamera()
+          result(nil)
+
+      case "resumeCamera":
+          BarcodeReaderPlugin.cameraViewInstance?.resumeCamera()
+          result(nil)
+
       default:
           result(FlutterMethodNotImplemented)
       }

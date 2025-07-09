@@ -22,4 +22,13 @@ class BarcodeReaderController {
       return null;
     }
   }
+
+  Future<void> pauseCamera() async {
+    await _channel.invokeMethod('pauseCamera');
+  }
+
+  Future<void> resumeCamera() async {
+    await _channel.invokeMethod('resumeCamera');
+  }
+
 }
