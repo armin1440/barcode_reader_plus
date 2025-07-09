@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'barcode_reader.dart';
 import 'barcode_reader_controller.dart';
+import 'barcode_reader_platform_interface.dart';
 
 class BarcodeReaderView extends StatefulWidget {
   const BarcodeReaderView({
@@ -21,12 +21,11 @@ class BarcodeReaderView extends StatefulWidget {
 
 class _BarcodeReaderViewState extends State<BarcodeReaderView> {
   final String viewType = 'barcode_reader_view';
-  final BarcodeReader barcodeReader = BarcodeReader();
 
   @override
   void initState() {
     super.initState();
-    barcodeReader.initBarcodeCallback(onScannedBarcode: (barcode) {
+    BarcodeReaderPlatform.instance.initBarcodeCallback(onScannedBarcode: (barcode) {
       widget.onScannedBarcode(barcode);
     });
   }

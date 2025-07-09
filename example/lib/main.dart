@@ -1,8 +1,7 @@
 import 'dart:developer';
 
-import 'package:barcode_reader_plus/barcode_reader_controller.dart';
+import 'package:barcode_reader_plus/barcode_reader_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:barcode_reader_plus/barcode_reader_view.dart';
 
 void main() {
   runApp(const MyApp());
