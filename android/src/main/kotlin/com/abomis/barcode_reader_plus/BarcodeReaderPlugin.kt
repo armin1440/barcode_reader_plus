@@ -1,6 +1,5 @@
-package com.abomis.barcode_reader
+package com.abomis.barcode_reader_plus
 
-import android.util.Log
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodCall

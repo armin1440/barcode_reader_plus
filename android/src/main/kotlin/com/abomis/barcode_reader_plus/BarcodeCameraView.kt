@@ -1,4 +1,4 @@
-package com.abomis.barcode_reader
+package com.abomis.barcode_reader_plus
 
 import android.content.Context
 import android.widget.FrameLayout
