@@ -11,6 +11,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Locale
+
 
 class BarcodeCameraView(
     context: Context,
@@ -23,6 +27,8 @@ class BarcodeCameraView(
 
     private val previewView = PreviewView(context)
     private var cameraControl: CameraControl? = null
+    private var imageCapture: ImageCapture? = null
+
 
     init {
         addView(previewView)
@@ -53,7 +59,11 @@ class BarcodeCameraView(
 
         val selector = CameraSelector.DEFAULT_BACK_CAMERA
         provider.unbindAll()
-        val camera = provider.bindToLifecycle(this, selector, preview, analyzer)
+        imageCapture = ImageCapture.Builder()
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+            .build()
+
+        val camera = provider.bindToLifecycle(this, selector, preview, analyzer, imageCapture)
         cameraControl = camera.cameraControl
         lifecycleRegistry.currentState = Lifecycle.State.RESUMED
     }
@@ -87,4 +97,32 @@ class BarcodeCameraView(
     fun toggleFlash(enabled: Boolean) {
         cameraControl?.enableTorch(enabled)
     }
+
+    fun takePicture(onResult: (String?) -> Unit) {
+        val imageCapture = this.imageCapture
+        if (imageCapture == null) {
+            onResult(null)
+            return
+        }
+
+        val file = File.createTempFile("barcode_image_", ".jpg", context.cacheDir)
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
+
+        imageCapture.takePicture(
+            outputOptions,
+            ContextCompat.getMainExecutor(context),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    onResult(file.absolutePath)
+                }
+
+                override fun onError(exception: ImageCaptureException) {
+                    exception.printStackTrace()
+                    onResult(null)
+                }
+            }
+        )
+    }
+
+
 }

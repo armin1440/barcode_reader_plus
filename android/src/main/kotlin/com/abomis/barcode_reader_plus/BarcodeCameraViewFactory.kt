@@ -29,5 +29,10 @@ class BarcodeCameraViewFactory(
     fun toggleFlash(enabled: Boolean) {
         cameraView?.toggleFlash(enabled)
     }
+
+    fun takePicture(callback: (String?) -> Unit) {
+        cameraView?.takePicture(callback)
+    }
+
 }
 

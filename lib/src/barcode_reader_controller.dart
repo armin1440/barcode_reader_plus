@@ -18,9 +18,8 @@ class BarcodeReaderController {
       final path = await _channel.invokeMethod<String>('takePicture');
       return path;
     } catch (e) {
-      print('Error taking picture: $e');
+      log('Error taking picture: $e');
       return null;
     }
   }
-
 }
