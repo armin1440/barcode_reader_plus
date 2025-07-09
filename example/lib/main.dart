@@ -36,7 +36,7 @@ class _MyAppState extends State<MyApp> {
             ),
             Switch(
               onChanged: (newState) {
-                // controller.changeFlashMode(newState);
+                controller.toggleFlash(newState);
                 setState(() {
                   flashState = newState;
                 });

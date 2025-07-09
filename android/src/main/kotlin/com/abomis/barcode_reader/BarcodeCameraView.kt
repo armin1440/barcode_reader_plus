@@ -22,6 +22,7 @@ class BarcodeCameraView(
         get() = lifecycleRegistry
 
     private val previewView = PreviewView(context)
+    private var cameraControl: CameraControl? = null
 
     init {
         addView(previewView)
@@ -52,7 +53,8 @@ class BarcodeCameraView(
 
         val selector = CameraSelector.DEFAULT_BACK_CAMERA
         provider.unbindAll()
-        provider.bindToLifecycle(this, selector, preview, analyzer)
+        val camera = provider.bindToLifecycle(this, selector, preview, analyzer)
+        cameraControl = camera.cameraControl
         lifecycleRegistry.currentState = Lifecycle.State.RESUMED
     }
 
@@ -80,5 +82,9 @@ class BarcodeCameraView(
             .addOnCompleteListener {
                 imageProxy.close()
             }
+    }
+
+    fun toggleFlash(enabled: Boolean) {
+        cameraControl?.enableTorch(enabled)
     }
 }

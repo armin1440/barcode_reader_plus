@@ -13,14 +13,21 @@ class BarcodeCameraViewFactory(
     private val methodChannel: MethodChannel
 ) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
 
+    private var cameraView: BarcodeCameraView? = null
+
     override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
-        val cameraView = BarcodeCameraView(context) { barcode ->
+        cameraView = BarcodeCameraView(context) { barcode ->
             methodChannel.invokeMethod("onBarcodeScanned", barcode)
         }
 
         return object : PlatformView {
-            override fun getView(): View = cameraView
+            override fun getView(): View = cameraView!!
             override fun dispose() {}
         }
     }
+
+    fun toggleFlash(enabled: Boolean) {
+        cameraView?.toggleFlash(enabled)
+    }
 }
+
