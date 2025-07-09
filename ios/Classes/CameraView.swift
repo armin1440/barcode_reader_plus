@@ -122,4 +122,21 @@ class CameraView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
 
         return timestamps.count >= scanThresholdCount
     }
+
+    func toggleFlash(_ enabled: Bool) {
+        guard let device = AVCaptureDevice.default(for: .video),
+              device.hasTorch else {
+            print("Torch not available")
+            return
+        }
+
+        do {
+            try device.lockForConfiguration()
+            device.torchMode = enabled ? .on : .off
+            device.unlockForConfiguration()
+        } catch {
+            print("Failed to toggle torch: \(error)")
+        }
+    }
+
 }

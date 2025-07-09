@@ -40,6 +40,7 @@ class BarcodeReaderView: NSObject, FlutterPlatformView {
         methodChannel: FlutterMethodChannel
     ) {
         cameraView = CameraView(frame: frame, methodChannel: methodChannel)
+        BarcodeReaderPlugin.setCameraView(cameraView)
         _view = UIView()
         super.init()
     }
