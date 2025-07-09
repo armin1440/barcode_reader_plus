@@ -17,6 +17,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final controller = BarcodeReaderController();
   bool flashState = false;
+  String path = 'take pic';
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +34,30 @@ class _MyAppState extends State<MyApp> {
                 },
               ),
             ),
-            Switch(
-              onChanged: (newState) {
-                controller.toggleFlash(newState);
-                setState(() {
-                  flashState = newState;
-                });
-              },
-              value: flashState,
+            Row(
+              children: [
+                Switch(
+                  onChanged: (newState) {
+                    controller.toggleFlash(newState);
+                    setState(() {
+                      flashState = newState;
+                    });
+                  },
+                  value: flashState,
+                ),
+                Flexible(
+                  child: TextButton(
+                    child: Text(path),
+                    onPressed: (){
+                      controller.takePicture().then((value){
+                        setState(() {
+                          path = value ?? 'none';
+                        });
+                      });
+                    },
+                  ),
+                )
+              ],
             ),
           ],
         ),

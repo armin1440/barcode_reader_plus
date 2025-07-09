@@ -13,7 +13,8 @@ class CameraView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
     private var scanTimestamps: [String: [TimeInterval]] = [:]
     private let scanThresholdCount = 2
     private let scanWindowMs: Double = 200
-
+    private var photoOutput: AVCapturePhotoOutput?
+    private var photoCaptureCompletion: ((String?) -> Void)?
 
     init(frame: CGRect, methodChannel: FlutterMethodChannel) {
         self.methodChannel = methodChannel
@@ -60,6 +61,12 @@ class CameraView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
         previewLayer?.frame = bounds
         if let layer = previewLayer {
             self.layer.addSublayer(layer)
+        }
+
+        let photoOutput = AVCapturePhotoOutput()
+        if captureSession.canAddOutput(photoOutput) {
+            captureSession.addOutput(photoOutput)
+            self.photoOutput = photoOutput
         }
 
         captureSession.commitConfiguration()
@@ -139,4 +146,45 @@ class CameraView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
         }
     }
 
+    func takePicture(completion: @escaping (String?) -> Void) {
+        guard let output = self.photoOutput else {
+            completion(nil)
+            return
+        }
+
+        let settings = AVCapturePhotoSettings()
+        output.capturePhoto(with: settings, delegate: self)
+
+        self.photoCaptureCompletion = completion
+    }
+
+}
+
+extension CameraView: AVCapturePhotoCaptureDelegate {
+    func photoOutput(_ output: AVCapturePhotoOutput,
+                     didFinishProcessingPhoto photo: AVCapturePhoto,
+                     error: Error?) {
+        if let error = error {
+            print("Error capturing photo: \(error)")
+            photoCaptureCompletion?(nil)
+            return
+        }
+
+        guard let data = photo.fileDataRepresentation() else {
+            photoCaptureCompletion?(nil)
+            return
+        }
+
+        let filename = UUID().uuidString + ".jpg"
+        let documents = FileManager.default.temporaryDirectory
+        let fileURL = documents.appendingPathComponent(filename)
+
+        do {
+            try data.write(to: fileURL)
+            photoCaptureCompletion?(fileURL.path)
+        } catch {
+            print("Error saving photo: \(error)")
+            photoCaptureCompletion?(nil)
+        }
+    }
 }

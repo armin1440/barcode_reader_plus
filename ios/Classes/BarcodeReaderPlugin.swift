@@ -31,7 +31,18 @@ public class BarcodeReaderPlugin: NSObject, FlutterPlugin {
                                   message: "Expected a boolean value for 'enabled'.",
                                   details: nil))
           }
-
+      case "takePicture":
+          if let view = BarcodeReaderPlugin.cameraViewInstance {
+              view.takePicture { path in
+                  if let path = path {
+                      result(path)
+                  } else {
+                      result(FlutterError(code: "capture_failed", message: "Photo capture failed", details: nil))
+                  }
+              }
+          } else {
+              result(FlutterError(code: "no_camera_view", message: "Camera view is not initialized", details: nil))
+          }
       default:
           result(FlutterMethodNotImplemented)
       }

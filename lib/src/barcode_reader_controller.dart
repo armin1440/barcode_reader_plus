@@ -12,4 +12,15 @@ class BarcodeReaderController {
       log('Failed to toggle flash: ${e.message}');
     }
   }
+
+  Future<String?> takePicture() async {
+    try {
+      final path = await _channel.invokeMethod<String>('takePicture');
+      return path;
+    } catch (e) {
+      print('Error taking picture: $e');
+      return null;
+    }
+  }
+
 }
