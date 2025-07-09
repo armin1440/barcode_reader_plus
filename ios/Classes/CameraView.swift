@@ -10,6 +10,10 @@ class CameraView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
     private let barcodeScanner = BarcodeScanner.barcodeScanner()
     private var isProcessing = false
     private var methodChannel: FlutterMethodChannel?
+    private var scanTimestamps: [String: [TimeInterval]] = [:]
+    private let scanThresholdCount = 2
+    private let scanWindowMs: Double = 200
+
 
     init(frame: CGRect, methodChannel: FlutterMethodChannel) {
         self.methodChannel = methodChannel
@@ -86,11 +90,12 @@ class CameraView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
 
             for barcode in barcodes {
                 if let value = barcode.rawValue {
-                    print("Detected barcode: \(value)")
-                    self?.sendBarcodeToFlutter(value)
-                    break // Only report first barcode
+                    if self?.shouldEmitBarcode(value) == true {
+                        self?.sendBarcodeToFlutter(value)
+                    }
                 }
             }
+
         }
     }
 
@@ -100,5 +105,21 @@ class CameraView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
         DispatchQueue.main.async {
             self.methodChannel?.invokeMethod("onBarcodeScanned", arguments: barcode)
         }
+    }
+
+    private func shouldEmitBarcode(_ value: String) -> Bool {
+        let now = Date().timeIntervalSince1970 * 1000 // ms
+        let window = scanWindowMs
+
+        var timestamps = scanTimestamps[value] ?? []
+        timestamps.append(now)
+
+        // Keep only those within window
+        timestamps = timestamps.filter { now - $0 <= window }
+
+        // Update the stored timestamps
+        scanTimestamps[value] = timestamps
+
+        return timestamps.count >= scanThresholdCount
     }
 }

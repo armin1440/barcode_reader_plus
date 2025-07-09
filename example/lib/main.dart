@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:barcode_reader/barcode_reader_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_reader/barcode_reader_view.dart';
 
@@ -15,19 +16,34 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final controller = BarcodeReaderController();
+  bool flashState = false;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: BarcodeReaderView(
-            onScannedBarcode: (barcode){
-              log('Barcode in flutter $barcode');
-            }
-          ),
+        appBar: AppBar(title: const Text('Plugin example app')),
+        body: Column(
+          children: [
+            Expanded(
+              child: BarcodeReaderView(
+                controller: controller,
+                onScannedBarcode: (barcode) {
+                  log('Barcode in flutter $barcode');
+                },
+              ),
+            ),
+            Switch(
+              onChanged: (newState) {
+                // controller.changeFlashMode(newState);
+                setState(() {
+                  flashState = newState;
+                });
+              },
+              value: flashState,
+            ),
+          ],
         ),
       ),
     );
