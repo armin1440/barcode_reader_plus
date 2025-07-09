@@ -1,7 +1,7 @@
-name: barcode_reader
+name: a_barcode_reader
 description: "Reads barcodes using camera"
 version: 1.0.0
-homepage: https://pub.dev/packages/barcode_reader
+homepage: https://pub.dev/packages/a_barcode_reader
 
 environment:
   sdk: ^3.7.2
@@ -21,7 +21,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.abomis.barcode_reader
+        package: com.abomis.a_barcode_reader
         pluginClass: BarcodeReaderPlugin
       ios:
         pluginClass: BarcodeReaderPlugin
