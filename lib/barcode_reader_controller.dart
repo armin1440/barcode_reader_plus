@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/services.dart';
 
 class BarcodeReaderController {
@@ -7,7 +9,7 @@ class BarcodeReaderController {
     try {
       await _channel.invokeMethod('toggleFlash', enabled);
     } on PlatformException catch (e) {
-      print('Failed to toggle flash: ${e.message}');
+      log('Failed to toggle flash: ${e.message}');
     }
   }
 }

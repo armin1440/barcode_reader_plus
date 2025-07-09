@@ -1,7 +1,7 @@
 name: barcode_reader
 description: "A new Flutter plugin project."
-version: 0.0.1
-homepage:
+version: 1.0.0
+homepage: https://pub.dev/packages/barcode_reader
 
 environment:
   sdk: ^3.7.2
