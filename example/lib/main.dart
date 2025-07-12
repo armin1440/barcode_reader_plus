@@ -23,58 +23,69 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Plugin example app')),
-        body: Column(
-          children: [
-            Expanded(
-              child: BarcodeReaderView(
-                controller: controller,
-                onScannedBarcode: (barcode) {
-                  log('Barcode in flutter $barcode');
-                },
+      initialRoute: '/',
+      routes: <String, WidgetBuilder>{
+        '/':
+            (BuildContext context) => Scaffold(
+              appBar: AppBar(title: const Text('Plugin example app')),
+              body: Column(
+                children: [
+                  Expanded(
+                    child: BarcodeReaderView(
+                      controller: controller,
+                      onScannedBarcode: (barcode) {
+                        log('Barcode in flutter $barcode');
+                      },
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Text('Flash'),
+                      Switch(
+                        onChanged: (newState) {
+                          controller.toggleFlash(newState);
+                          setState(() {
+                            flashState = newState;
+                          });
+                        },
+                        value: flashState,
+                      ),
+                      Flexible(
+                        child: TextButton(
+                          child: Text(path),
+                          onPressed: () {
+                            controller.takePicture().then((value) {
+                              setState(() {
+                                path = value ?? 'none';
+                              });
+                            });
+                          },
+                        ),
+                      ),
+                      Switch(
+                        value: isPaused,
+                        onChanged: (newValue) {
+                          if (isPaused) {
+                            controller.resumeCamera();
+                          } else {
+                            controller.pauseCamera();
+                          }
+                          setState(() {
+                            isPaused = newValue;
+                          });
+                        },
+                      ),
+                      TextButton(onPressed: () => Navigator.pushNamed(context, '/b'), child: Text('To Page2')),
+                    ],
+                  ),
+                ],
               ),
             ),
-            Row(
-              children: [
-                Text('Flash'),
-                Switch(
-                  onChanged: (newState) {
-                    controller.toggleFlash(newState);
-                    setState(() {
-                      flashState = newState;
-                    });
-                  },
-                  value: flashState,
-                ),
-                Flexible(
-                  child: TextButton(
-                    child: Text(path),
-                    onPressed: (){
-                      controller.takePicture().then((value){
-                        setState(() {
-                          path = value ?? 'none';
-                        });
-                      });
-                    },
-                  ),
-                ),
-                Switch(value: isPaused, onChanged: (newValue){
-                  if(isPaused) {
-                    controller.resumeCamera();
-                  }
-                  else{
-                    controller.pauseCamera();
-                  }
-                  setState(() {
-                    isPaused = newValue;
-                  });
-                })
-              ],
+        '/b':
+            (BuildContext context) => Scaffold(
+              body: Center(child: TextButton(onPressed: () => Navigator.pop(context), child: Text('Pop me'))),
             ),
-          ],
-        ),
-      ),
+      },
     );
   }
 }

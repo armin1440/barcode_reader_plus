@@ -7,3 +7,5 @@ Add start and pause functionality
 Add taking picture functionality
 ## 1.1.1
 Fixed overlapping view on Android
+## 1.1.2
+Fixed scanning even when camera is not visible
