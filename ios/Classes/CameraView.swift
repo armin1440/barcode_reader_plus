@@ -10,9 +10,9 @@ class CameraView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
     private let barcodeScanner = BarcodeScanner.barcodeScanner()
     private var isProcessing = false
     private var methodChannel: FlutterMethodChannel?
-    private var scanTimestamps: [String: [TimeInterval]] = [:]
-    private let scanThresholdCount = 2
-    private let scanWindowMs: Double = 200
+//    private var scanTimestamps: [String: [TimeInterval]] = [:]
+//    private let scanThresholdCount = 2
+//    private let scanWindowMs: Double = 200
     private var photoOutput: AVCapturePhotoOutput?
     private var photoCaptureCompletion: ((String?) -> Void)?
 
@@ -97,9 +97,9 @@ class CameraView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
 
             for barcode in barcodes {
                 if let value = barcode.rawValue {
-                    if self?.shouldEmitBarcode(value) == true {
+//                    if self?.shouldEmitBarcode(value) == true {
                         self?.sendBarcodeToFlutter(value)
-                    }
+//                    }
                 }
             }
 
@@ -114,21 +114,21 @@ class CameraView: UIView, AVCaptureVideoDataOutputSampleBufferDelegate {
         }
     }
 
-    private func shouldEmitBarcode(_ value: String) -> Bool {
-        let now = Date().timeIntervalSince1970 * 1000 // ms
-        let window = scanWindowMs
-
-        var timestamps = scanTimestamps[value] ?? []
-        timestamps.append(now)
-
-        // Keep only those within window
-        timestamps = timestamps.filter { now - $0 <= window }
-
-        // Update the stored timestamps
-        scanTimestamps[value] = timestamps
-
-        return timestamps.count >= scanThresholdCount
-    }
+//    private func shouldEmitBarcode(_ value: String) -> Bool {
+//        let now = Date().timeIntervalSince1970 * 1000 // ms
+//        let window = scanWindowMs
+//
+//        var timestamps = scanTimestamps[value] ?? []
+//        timestamps.append(now)
+//
+//        // Keep only those within window
+//        timestamps = timestamps.filter { now - $0 <= window }
+//
+//        // Update the stored timestamps
+//        scanTimestamps[value] = timestamps
+//
+//        return timestamps.count >= scanThresholdCount
+//    }
 
     func toggleFlash(_ enabled: Bool) {
         guard let device = AVCaptureDevice.default(for: .video),

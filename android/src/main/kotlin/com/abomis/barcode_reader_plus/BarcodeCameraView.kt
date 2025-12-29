@@ -68,7 +68,7 @@ class BarcodeCameraView(
         lifecycleRegistry.currentState = Lifecycle.State.RESUMED
     }
 
-    private val scanTimestamps = mutableMapOf<String, MutableList<Long>>()
+//    private val scanTimestamps = mutableMapOf<String, MutableList<Long>>()
 
     private fun processImage(imageProxy: ImageProxy) {
         val mediaImage = imageProxy.image ?: return imageProxy.close()
@@ -79,14 +79,14 @@ class BarcodeCameraView(
                 val now = System.currentTimeMillis()
                 for (barcode in barcodes) {
                     val value = barcode.rawValue ?: continue
-                    val times = scanTimestamps.getOrPut(value) { mutableListOf() }
-                    times.add(now)
-                    times.retainAll { now - it <= 200 }
+//                    val times = scanTimestamps.getOrPut(value) { mutableListOf() }
+//                    times.add(now)
+//                    times.retainAll { now - it <= 200 }
 
-                    if (times.size >= 3) {
-                        scanTimestamps.remove(value)
+//                    if (times.size >= 3) {
+//                        scanTimestamps.remove(value)
                         onBarcodeScanned(value)
-                    }
+//                    }
                 }
             }
             .addOnCompleteListener {
