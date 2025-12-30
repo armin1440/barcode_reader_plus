@@ -12,4 +12,6 @@ Fixed scanning even when camera is not visible
 ## 1.1.3
 Use GoogleMLKit/BarcodeScanning V2.0.0 for ios 
 ## 1.1.4
-Removed time stamps for validation of scanned tags 
+Removed time stamps for validation of scanned tags
+## 1.1.5
+Fixed crashing when scanning a barcode on android
