@@ -15,3 +15,5 @@ Use GoogleMLKit/BarcodeScanning V2.0.0 for ios
 Removed time stamps for validation of scanned tags
 ## 1.1.5
 Fixed crashing when scanning a barcode on android
+## 1.1.6
+Removed READ_MEDIA_IMAGES/READ_MEDIA_VIDEO permission from example app
